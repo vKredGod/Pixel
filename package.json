@@ -1,0 +1,19 @@
+{
+  "name": "pixel",
+  "version": "1.0.0",
+  "description": "A discord bot. WIP",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "Discord"
+  ],
+  "author": "vKredGod",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^11.4.2",
+    "mongodb": "^3.2.3",
+    "mongoose": "^5.5.2"
+  }
+}
