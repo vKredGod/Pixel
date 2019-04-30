@@ -1,2 +1,2 @@
-module.exports.run = async (client) => {
+module.exports.run = async (bot) => {
 }

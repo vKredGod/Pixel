@@ -1,55 +1,54 @@
 let Discord = require("discord.js");
 let config = require(__dirname + "/../../config.json");
+let ms = require("ms");
 
 module.exports.run = async (bot, message, args) => {
-  if(!message.member.hasPermission('BAN_MEMBERS'))
-    return message.channel.send("Hey " + message.member + ", you don't have permissions to use this!");
+  if (!message.member.hasPermission("BAN_MEMBERS"))
+    return message.channel.send(
+      "Hey " + message.member + ", you don't have permissions to use this!"
+    );
 
-    if (args.length >= 1) {
-        let user = args[0];
-        let reason = args.slice(1).join(" ")
-        let guild = bot.guilds.get(message.guild.id);
+  let commandDescription = new Discord.RichEmbed()
+    .setTitle(`Command: ${this.info.name}`)
+    .addField(`Usage: `, `${this.info.usage.join("\n")}`)
+    .addField(`Description: `, `${this.info.description}`)
+    .setColor("#4292f4");
 
-        if (guild.member(message.mentions.users.first())) {
-            let user = message.mentions.users.first();
-            let member = message.guild.member(user);
+  let member = message.mentions.members.first();
 
-            if (member) {
-              if(!member.bannable) return message.channel.send("This user cannot be banned. Maybe he has a higher role?");
-            member.ban("Kicked by pixel.").then((member) => {
-                message.channel.send(`:hammer: User ${user.tag} was banned.`);
-            }).catch(() => {
-                message.channel.send("Hey, " + message.author + ", you don't have access to that command!");
-            });
-        }
-        } else {
-            message.channel.send("Sorry, I could not find any user with that name!");
-        }
-    } else {
-        message.channel.send({embed: {
-            color: 3447003,
-            author: {
-              name: bot.user.username,
-              icon_url: bot.user.avatarURL
-            },
-            fields: [{
-                name: "Command usage",
-                value: "usage: <prefix>ban @<user>"
-              },
-              {
-                name: "Description",
-                value: "Kicks the user mentioned in the command."
-              }
-            ],
-            timestamp: new Date(),
-            footer: {
-              icon_url: bot.user.avatarURL,
-              text: "© Pixel"
-            }
-          }
-        });
-    }
-}
+  if (args.length == 0) return await message.channel.send("", commandDescription);
+
+  if (!member)
+    return await message.channel.send(
+      "I'm sorry, I couldn't find any user with that name."
+    );
+  let username = member.user.tag
+  let bannedBy = message.author.tag
+    
+  if (!member.bannable)
+    return await message.channel.send(
+      "I couldn't ban this user. Maybe I don't have permissions or the user has a higher role."
+    );
+
+  if (args[args.length - 2] == "-d") {
+    let input = args;
+    let duration = input[input.length - 1];
+    input.pop();
+    input.pop();
+    let reason = input.slice(1);
+  } else {
+    let reason = args.slice(1);
+    member.ban({
+      reason: `Banned by: ${bannedBy}. Reason: ${reason}`
+    })
+    await message.delete()
+    await message.channel.send(`:hammer: Member ${username} was banned.`).then(msg => {
+      msg.delete(3500)
+    })
+  }
+};
 module.exports.info = {
-    name: "ban"
-}
+  name: "ban",
+  description: "Bans the mentioned user for the specified ammount of time. Ban will last forever if no time is given.",
+  usage: ["ban <user> [reason] -d [duration]"]
+};

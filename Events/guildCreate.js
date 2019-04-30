@@ -1,9 +1,8 @@
 const Discord = require("discord.js")
 const config = require("../config.json")
 const fs = require("fs")
-const Guild = require("../models/guild.js")
-const mongoose = require("mongoose")
-
+const Enmap = require("enmap")
+const defaultSettings = require("../Utilities/defaultSettings.js")
 
 module.exports.run = async (bot, guild) => {
     if (!guild.available) return console.log("An error occurred while joining a guild.")
@@ -28,19 +27,6 @@ module.exports.run = async (bot, guild) => {
 		      .setColor("#4292f4")
   })
 
-    let server = new Guild({
-        _id: mongoose.Types.ObjectId(),
-        guildName: guild.name,
-        guildID: guild.id,
-        guildOwnerId: guild.ownerID,
-        guildBotPrefix: "$",
-        guildMemberCount: guild.memberCount,
-        guildWhitelist: false,
-        guildCommandsBlacklist: [],
-        guildDefaultRole: null
-    })
-
-    server.save()
-
+    bot.guildSettings.ensure(guild.id, defaultSettings)
     console.log(`Joined guild ${guild.name}`)
 }
